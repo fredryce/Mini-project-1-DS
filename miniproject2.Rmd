@@ -1,0 +1,45 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyr)
+library(tidyverse)
+library(purrr)
+library(readr)
+library(plotly)
+library(sf)
+```
+
+
+
+```{r}
+
+data_lake <- read_sf("./lakes/Florida_Lakes.shp")
+data_county <- read_sf("./counties/Florida_Counties.shp")
+
+head(data_lake)
+head(data_county)
+```
+```{r}
+ggplot() +
+ geom_sf(data = filter(data_county, COUNTYNAME=="POLK")) +
+ geom_sf(data = filter(data_lake, COUNTY== "POLK"),
+ aes(fill = SHAPEAREA)) +
+  theme_void() +
+ labs(title = "Lakes in Polk County", fill="Size")
+
+```
+```{r}
+#number of lakes in counties
+data_lake %>% 
+  group_by(COUNTY) %>% 
+  count(sort=T) %>% 
+  rename(COUNTYNAME=COUNTY) %>% 
+  right_join(as.data.frame(data_county), by="COUNTYNAME") %>% 
+  ggplot() +
+  geom_sf()
+  
+```
+
